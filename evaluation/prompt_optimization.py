@@ -114,7 +114,7 @@ results["validation_acc"].append(eval_dataset(val_set, eval_fn, model))
 results["prompt"].append(system_prompt.get_value())
 
 
-for epoch in range(args.max_epochs):
+for epoch in range(1):
     for steps, (batch_x, batch_y) in enumerate((pbar := tqdm(train_loader, position=0))):
         pbar.set_description(f"Training step {steps}. Epoch {epoch}")
         optimizer.zero_grad()
@@ -137,10 +137,11 @@ for epoch in range(args.max_epochs):
         test_acc = eval_dataset(test_set, eval_fn, model)
         results["test_acc"].append(test_acc)
         results["prompt"].append(system_prompt.get_value())
-        if steps == 3:
+        if steps == 7:
             break
 
 # Also dump the final results
 import json
-with open(f"./figures/results_{args.task}_{args.test_engine}.json", "w") as f:
+os.makedirs("./results", exist_ok=True)
+with open(f"./results/results_{args.task}_{args.test_engine}.json", "w") as f:
     json.dump(results, f)

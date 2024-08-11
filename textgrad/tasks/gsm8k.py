@@ -14,13 +14,13 @@ class GSM8K(Dataset):
         self.subset = subset
         assert split in ["train", "val", "test"]
         if split == "test":
-            self.data = load_dataset("gsm8k", subset, cache_dir=root, split="test[:300]")
+            self.data = load_dataset("gsm8k", subset, cache_dir=root, split="test")
         elif split == "val":
             # Split the training set into half. Let the second half be the training set.
             # Let the first 100 samples be the validation set.
-            self.data = load_dataset("gsm8k", subset, cache_dir=root, split="train[:100]")
+            self.data = load_dataset("gsm8k", subset, cache_dir=root, split="train[:128]")
         elif split == "train":
-            self.data = load_dataset("gsm8k", subset, cache_dir=root, split="train[100:]")
+            self.data = load_dataset("gsm8k", subset, cache_dir=root, split="train[:128]")
         self.split = split
     
     def __getitem__(self, index):
@@ -34,7 +34,7 @@ class GSM8K(Dataset):
         return len(self.data)
 
     def get_task_description(self):
-        return "You will answer a mathemetical reasoning question. Think step by step. The last line of your response should be of the following format: 'Answer: $VALUE' where VALUE is a numerical value."
+        return "Question answering"
 
     
     
@@ -75,8 +75,8 @@ class GSM8K_DSPy(GSM8K):
         rng.shuffle(official_train)
         rng = random.Random(0)
         rng.shuffle(official_test)
-        trainset = official_train[:200]
-        devset = official_train[200:500]
+        trainset = official_train[:128]
+        devset = official_train[:128]
         testset = official_test[:]
         if split == "train":
             self.data = trainset

@@ -50,8 +50,8 @@ class BigBenchHard(Dataset):
         self._check_or_download_dataset()
         assert split in ["train", "val", "test"]
         data_path = os.path.join(self.root, self.task_name, f"{split}.csv")
-        self.data = pd.read_csv(data_path, index_col=0)
-        self._task_description = "You will answer a reasoning question. Think step by step. The last line of your response should be of the following format: 'Answer: $VALUE' where VALUE is a numerical value."
+        self.data = pd.read_csv(data_path, index_col=0, dtype=str)
+        self._task_description = "Question Answering"
     
     def get_task_description(self):
         return self._task_description 
@@ -76,9 +76,9 @@ class BigBenchHard(Dataset):
         # Separate to train, val, test
         data = json.load(open(os.path.join(self.root, f"{self.task_name}.json")))
         examples = data["examples"]
-        train_examples = [{"x": ex["input"], "y": ex["target"]} for ex in examples[:50]]
-        val_examples = [{"x": ex["input"], "y": ex["target"]} for ex in examples[50:150]]
-        test_examples = [{"x": ex["input"], "y": ex["target"]} for ex in examples[150:]]
+        train_examples = [{"x": ex["input"], "y": ex["target"]} for ex in examples[:20]]
+        val_examples = [{"x": ex["input"], "y": ex["target"]} for ex in examples[:20]]
+        test_examples = [{"x": ex["input"], "y": ex["target"]} for ex in examples[20:]]
         train_path = os.path.join(self.root, self.task_name, "train.csv")
         with open(train_path, "w") as f:
             pd.DataFrame(train_examples).to_csv(f)
