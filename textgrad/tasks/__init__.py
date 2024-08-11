@@ -25,6 +25,21 @@ def load_task(task_name: str, evaluation_api: EngineLM, *args, **kwargs) -> Tupl
         task_name: the name of the task to evaluate
         evaluation_api: the engine to use for evaluation, if needed
     """
+    if "BBH" in task_name:
+        from textgrad.loss import MultiFieldTokenParsedEvaluation
+        from .big_bench_hard import BigBenchHard, string_based_equality_fn
+        from textgrad.autograd.string_based_ops import StringBasedFunction
+        task_name = task_name[4:]
+        train_set = BigBenchHard(task_name, split="train", *args, **kwargs)
+        val_set = BigBenchHard(task_name, split="val", *args, **kwargs)
+        test_set = BigBenchHard(task_name, split="test", *args, **kwargs)
+        def exact_match(prediction, ground_truth_answer):
+            return int(prediction.value.strip() == ground_truth_answer.value.strip())
+
+        fn_purpose = "The runtime of string-based function that checks if the prediction exactly matches the ground truth."
+        eval_fn = StringBasedFunction(exact_match, function_purpose=fn_purpose)
+        return train_set, val_set, test_set, eval_fn
+        
     if "object_counting" in task_name:
         from textgrad.loss import MultiFieldTokenParsedEvaluation
         from .big_bench_hard import BigBenchHard, string_based_equality_fn
