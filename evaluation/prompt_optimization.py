@@ -98,8 +98,8 @@ system_prompt = tg.Variable(STARTING_SYSTEM_PROMPT,
                             role_description="system prompt to the language model")
 model_evaluation = tg.BlackboxLLM(llm_api_eval, system_prompt)
 
-if not args.do_not_run_larger_model:
-    reference = np.mean(eval_dataset(test_set, eval_fn, model_evaluation))
+# if not args.do_not_run_larger_model:
+#     reference = np.mean(eval_dataset(test_set, eval_fn, model_evaluation))
 
 
 system_prompt = tg.Variable(STARTING_SYSTEM_PROMPT, 
@@ -110,7 +110,7 @@ model = tg.BlackboxLLM(llm_api_test, system_prompt)
 optimizer = tg.TextualGradientDescent(engine=llm_api_eval, parameters=[system_prompt])
 
 results = {"test_acc": [], "prompt": [], "validation_acc": []}
-results["test_acc"].append(eval_dataset(test_set, eval_fn, model))
+# results["test_acc"].append(eval_dataset(test_set, eval_fn, model))
 results["validation_acc"].append(eval_dataset(val_set, eval_fn, model))
 results["prompt"].append(system_prompt.get_value())
 
