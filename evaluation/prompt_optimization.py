@@ -136,11 +136,10 @@ for epoch in range(1):
             run_validation_revert(system_prompt, results, model, eval_fn, val_set)
         print("sys prompt: ", system_prompt)
         results["prompt"].append(system_prompt.get_value())
-        if steps % 3 == 0:
+        
+        if steps == 3:
             test_acc = eval_dataset(test_set, eval_fn, model)
             results["test_acc"].append(test_acc)
-
-        if steps == 3:
             break
 
 # Also dump the final results
