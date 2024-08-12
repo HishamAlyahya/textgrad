@@ -37,7 +37,8 @@ def eval_sample(item, eval_fn, model):
     try:
         eval_output_variable = eval_fn(inputs=dict(prediction=response, ground_truth_answer=y))
         return int(eval_output_variable.value)
-    except:
+    except Exception as e:
+        print(e)
         eval_output_variable = eval_fn([x, y, response])
         eval_output_parsed = eval_fn.parse_output(eval_output_variable)
         return int(eval_output_parsed)
@@ -134,10 +135,12 @@ for epoch in range(1):
         if args.run_validation:
             run_validation_revert(system_prompt, results, model, eval_fn, val_set)
         print("sys prompt: ", system_prompt)
-        test_acc = eval_dataset(test_set, eval_fn, model)
-        results["test_acc"].append(test_acc)
         results["prompt"].append(system_prompt.get_value())
-        if steps == 7:
+        if steps % 3 == 0:
+            test_acc = eval_dataset(test_set, eval_fn, model)
+            results["test_acc"].append(test_acc)
+
+        if steps == 3:
             break
 
 # Also dump the final results
