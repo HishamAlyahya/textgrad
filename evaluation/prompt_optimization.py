@@ -144,6 +144,7 @@ for epoch in range(1):
 
 # Also dump the final results
 import json
+import os
 os.makedirs("./results", exist_ok=True)
 with open(f"./results/results_{args.task}_{args.test_engine}.json", "w") as f:
     json.dump(results, f)

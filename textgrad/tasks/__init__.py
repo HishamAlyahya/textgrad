@@ -34,7 +34,7 @@ def load_task(task_name: str, evaluation_api: EngineLM, *args, **kwargs) -> Tupl
         val_set = BigBenchHard(task_name, split="val", *args, **kwargs)
         test_set = BigBenchHard(task_name, split="test", *args, **kwargs)
         def exact_match(prediction, ground_truth_answer):
-            return int(prediction.value.strip() == ground_truth_answer.value.strip())
+            return int(prediction.value == ground_truth_answer.value)
 
         fn_purpose = "The runtime of string-based function that checks if the prediction exactly matches the ground truth."
         eval_fn = StringBasedFunction(exact_match, function_purpose=fn_purpose)
