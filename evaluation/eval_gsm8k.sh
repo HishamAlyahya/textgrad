@@ -1,0 +1,1 @@
+python prompt_optimization.py --task=BBH_"GSM8K_DSPy" --run_validation --evaluation_engine=gpt-4-turbo --test_engine=gpt-4o-mini
