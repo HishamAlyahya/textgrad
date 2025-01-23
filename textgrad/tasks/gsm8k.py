@@ -34,7 +34,7 @@ class GSM8K(Dataset):
         return len(self.data)
 
     def get_task_description(self):
-        return "Question answering"
+        return "Answer the Question. Think step by step. Finish with an answer to the question wrapped by <answer></answer>"
 
     
     

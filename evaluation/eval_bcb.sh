@@ -1,0 +1,1 @@
+python prompt_optimization_bcb.py --task="BCB" --run_validation --evaluation_engine=gpt-4-turbo --test_engine=gpt-4o-mini

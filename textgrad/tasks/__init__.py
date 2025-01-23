@@ -6,6 +6,9 @@ from typing import Tuple, Callable
 from textgrad import Variable
 from textgrad.engine import EngineLM
 
+from bigcodebench.evaluate import untrusted_check
+from bigcodebench.sanitize import sanitize
+
 AVAILABLE_DATASETS = [
     "BBH_object_counting",
     "BBH_word_sorting",
@@ -96,10 +99,54 @@ def load_task(task_name: str, evaluation_api: EngineLM, *args, **kwargs) -> Tupl
             "Ground truth answer",
             "Prediction from the language model"
         ]
-        fn_purpose = "The runtime of string-based function that checks if the prediction is correct."
-        eval_fn = StringBasedFunction(string_based_equality_fn, function_purpose=fn_purpose)
+        def extract_prediction(prediction):
+            # extract the answer wrapped by <answer> and </answer>
+            import re
+            match = re.search(r'<answer>(.*)</answer>', prediction)
+            if match:
+                return match.group(1)
+            else:
+                return ""
+
+        def exact_match(prediction, ground_truth_answer):
+            return int(extract_prediction(prediction.value) == ground_truth_answer.value)
+
+        fn_purpose = "The runtime of string-based function that checks if the prediction wrapped in <answer></answer> exactly matches the ground truth."
+        eval_fn = StringBasedFunction(exact_match, function_purpose=fn_purpose)
         return train_set, val_set, test_set, eval_fn
-    
+    elif task_name == "BCB":
+        from .big_code_bench import BigCodeBench
+        from textgrad.autograd.string_based_ops import StringBasedFunction
+
+        train_set = BigCodeBench(split="train", *args, **kwargs)
+        val_set = BigCodeBench(split="val", *args, **kwargs)
+        test_set = BigCodeBench(split="test", *args, **kwargs)
+
+        fn_purpose = "The runtime of string-based function that checks whether the generated code is correct."
+
+        min_time_limit: float = 1
+        max_as_limit: int = 30*1024
+        max_data_limit: int = 30*1024
+        max_stack_limit: int = 10
+
+        def is_correct_code(output, tests, entry_point):
+            res = untrusted_check(
+                sanitize(output.value, entry_point.value),
+                tests.value,
+                entry_point.value,
+                max_as_limit,
+                max_data_limit,
+                max_stack_limit,
+                min_time_limit,
+            )
+            # print(res)
+            # print(res[0])
+            return int(res[0] == "pass")
+
+        eval_fn = StringBasedFunction(is_correct_code, function_purpose=fn_purpose)
+        # eval_fn = is_correct_code
+        return train_set, val_set, test_set, eval_fn
+
     else:
         raise ValueError(f"Task {task_name} not found.")
 

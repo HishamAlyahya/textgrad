@@ -59,6 +59,11 @@ class ChatOpenAI(EngineLM, CachedEngine):
                 base_url=base_url,
                 api_key="ollama"
             )
+        elif base_url and "openrouter" in base_url:
+            self.client = OpenAI(
+                base_url=base_url,
+                api_key=kwargs.get("api_key")
+            )
         else:
             raise ValueError("Invalid base URL provided. Please use the default OLLAMA base URL or None.")
 
